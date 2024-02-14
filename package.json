@@ -5,7 +5,11 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "serve": "node server.js"
+    "serve": "node server.js",
+    "start": "pm2 start server.js",
+    "stop": "pm2 stop server.js",
+    "restart": "pm2 restart server.js",
+    "delete": "pm2 delete server.js"
   },
   "keywords": [],
   "author": "",
