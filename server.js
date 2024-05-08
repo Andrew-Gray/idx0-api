@@ -1,14 +1,17 @@
 import 'dotenv/config'
 import express from 'express'
 import * as fs from 'fs';
-import mysql from 'mysql2'
+import { createClient } from "@libsql/client";
 import { LoremIpsum } from "lorem-ipsum"
 import QRCode from 'qrcode'
 import dateFns from 'date-fns'
 
 const port = process.env.PORT || 3000
 const server = express()
-const connection = mysql.createConnection(process.env.DATABASE_URL)
+const db = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
 
 
 //PLACEHOLDER
@@ -377,26 +380,20 @@ server.get('/tools/date/add', (req, res) => {
 
 
 //File Reading
-server.get('/tools/fakeProfile', (req, res) => {
+server.get('/tools/fakeProfile', async (req, res) => {
   const ID = getRandomInt(1, 25000);
 
-  const sql = `SELECT * FROM FakeProfile WHERE id = ${ID}`;
-  connection.query({ sql }, (err, result, fields) => {
-    if (err instanceof Error) {
-      console.error(err);
-      res.status(500).send(err);
-      return;
-    }
-
-    const data = result[0];
-    data.mothersMaiden = data.mothersMaiden.trim();
-    data.color = data.color.replace(/\r/g, "");
-
-
-    res.setHeader('Content-Type', 'application/json');
-    res.send(`${JSON.stringify(data)}`)
+  const bdRes = await db.execute({
+    sql: "SELECT * FROM FakeProfile WHERE id = ?",
+    args: [ID],
   });
+  let data = JSON.parse(JSON.stringify(bdRes.rows[0]));
 
+  data.mothersMaiden = data.mothersMaiden.trim();
+  data.color = data.color.replace(/\r/g, "");
+
+  res.setHeader('Content-Type', 'application/json');
+  res.send(`${JSON.stringify(data)}`)
 })
 
 
