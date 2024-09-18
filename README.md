@@ -9,3 +9,4 @@
  5. Add **TURSO_URL** to env file. 
 	 * Example: `TURSO_URL={TURSO_DATABASE_URL}?authToken={TURSO_DATABASE_URL}`
  6. Create tables using SQL from turso\tables.sql
+ 7. Import data from turso\FakeProfile.csv into FakeProfile table
